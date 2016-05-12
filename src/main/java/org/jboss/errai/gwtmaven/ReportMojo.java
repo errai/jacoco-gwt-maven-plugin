@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
@@ -87,6 +88,16 @@ public class ReportMojo extends AbstractJacocoMojo {
    * @parameter default-value="${project.build.directory}/snapshot-classes"
    */
   private File snapshotDirectory;
+
+  /**
+   * The classes which are exercised from GWTTestCase and the unit tests,
+   * but shouldn't taken from the GWTTestCase recording to calculate the coverage.
+   * This is a comma separated list of regex patterns.
+   * Be aware that you have to match the compiled classes (eg. DoSomething.class, DoSomething$Innerclass.class).
+   *
+   * @parameter default-value=""
+   */
+  private String unitTestPrecedences;
 
   private SessionInfoStore sessionInfoStore;
 
@@ -286,14 +297,25 @@ public class ReportMojo extends AbstractJacocoMojo {
 
     // build two collections of relative pathnames
     List<?> originalClasses = FileUtils.getFiles(rootDir, includes, excludes, false);
-    Set<File> snapshotClases = getSnapshotRelativeFiles();
+    Set<File> snapshotClasses = getSnapshotRelativeFiles();
 
     // now build one list of absolute pathnames, using items from the snapshot
     // list where they exist
     List<File> filesToAnalyze = new ArrayList<File>(originalClasses.size());
+
+    // create the regex for the classes which should taken from the originalClasses
+    Set<Pattern> unitTestPrecedencePatterns = new HashSet<Pattern>();
+    if(StringUtils.isNotEmpty(unitTestPrecedences)) {
+      String[] unitTestPrecedences = this.unitTestPrecedences.split(",");
+      for(String unitTestPrecedence: unitTestPrecedences) {
+        getLog().info("added unitTestPrecedence pattern: " + unitTestPrecedence);
+        unitTestPrecedencePatterns.add(Pattern.compile(unitTestPrecedence));
+      }
+    }
+
     for (Object o : originalClasses) {
       File f = (File) o;
-      if (snapshotClases.contains(f)) {
+      if (snapshotContainClassAndPrecedenceIsNotOnUnitTest(snapshotClasses, f, unitTestPrecedencePatterns)) {
         filesToAnalyze.add(new File(snapshotDirectory, f.getPath()));
         getLog().debug("Using snapshot class for " + f);
       }
@@ -303,6 +325,21 @@ public class ReportMojo extends AbstractJacocoMojo {
     }
 
     return filesToAnalyze;
+  }
+
+  private boolean snapshotContainClassAndPrecedenceIsNotOnUnitTest(Set<File> snapshotClasses, File f, Set<Pattern> unitTestPrecedencePatterns) {
+    if(!unitTestPrecedencePatterns.isEmpty()){
+      for(Pattern unitTestPrecedencePattern: unitTestPrecedencePatterns) {
+        if(unitTestPrecedencePattern.matcher(f.getName()).matches()) {
+          getLog().info("for class: " + f.getName() + " we give the unit test precedence [pattern: " + unitTestPrecedencePattern + "]");
+          return false;
+        }
+      }
+    }
+    if(snapshotClasses.contains(f)) {
+      return true;
+    }
+    return false;
   }
 
   /**
@@ -315,6 +352,9 @@ public class ReportMojo extends AbstractJacocoMojo {
    */
   @SuppressWarnings("unchecked")
   private HashSet<File> getSnapshotRelativeFiles() throws IOException {
+    if(!snapshotDirectory.exists()) {
+      return new HashSet<File>();
+    }
     return new HashSet<File>(FileUtils.getFiles(snapshotDirectory, "**", "", false));
   }
 
