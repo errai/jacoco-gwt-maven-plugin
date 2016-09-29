@@ -1,7 +1,8 @@
 = JaCoCo-GWT Maven Plugin
 
-This plugin makes it possible to collect and report on test coverage
-from tests that extend GWTTestCase.
+This is a fork of https://github.com/errai/jacoco-gwt-maven-plugin
+The plugin is extended with the possibility to give the plain unit test classes precedence, in the case a method is tested by plain unit test and gwt testcase. You want to use this feature if the plain unit test has the better coverage than the gwt test case. 
+Check out the configuration `unitTestPrecedences`
 
 == Setup
 
@@ -12,7 +13,10 @@ Add the following to the `<plugins>` section of your pom.xml:
 <plugin>
   <groupId>org.jboss.errai</groupId>
   <artifactId>jacoco-gwt-maven-plugin</artifactId>
-  <version>0.5.4.201202141554</version>
+  <version>0.6.5.201403032054</version>
+  <configuration>
+    <unitTestPrecedences>.*IHaveABetterPlainUnitTestCoverage\..*,.*MeToo\.*</unitTestPrecedences>
+  </configuration>
   <executions>
     <execution>
       <id>jacoco-initialize</id>

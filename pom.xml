@@ -15,7 +15,7 @@
 
   <groupId>org.jboss.errai</groupId>
   <artifactId>jacoco-gwt-maven-plugin</artifactId>
-  <version>0.5.4.201202141554</version>
+  <version>0.6.5.201403032054</version>
   <packaging>maven-plugin</packaging>
 
   <name>JaCoCo :: GWT Maven Plugin</name>
@@ -78,17 +78,17 @@
       <groupId>org.jacoco</groupId>
       <artifactId>org.jacoco.agent</artifactId>
       <classifier>runtime</classifier>
-      <version>0.5.4.201111111111</version>
+      <version>0.6.5.201403032054</version>
     </dependency>
     <dependency>
       <groupId>org.jacoco</groupId>
       <artifactId>org.jacoco.core</artifactId>
-      <version>0.5.4.201111111111</version>
+      <version>0.6.5.201403032054</version>
     </dependency>
     <dependency>
       <groupId>org.jacoco</groupId>
       <artifactId>org.jacoco.report</artifactId>
-      <version>0.5.4.201111111111</version>
+      <version>0.6.5.201403032054</version>
     </dependency>
   </dependencies>
 
