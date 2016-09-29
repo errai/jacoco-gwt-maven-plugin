@@ -1,7 +1,7 @@
 = JaCoCo-GWT Maven Plugin
 
 This is a fork of https://github.com/errai/jacoco-gwt-maven-plugin
-The plugin is extended with the possibility to give the plain unit test classes precedence, in the case a method is tested by both, gwt testcase and plain unit test.  
+The plugin is extended with the possibility to give the plain unit test classes precedence, in the case a method is tested by plain unit test and gwt testcase. You want to use this feature if the plain unit test has the better coverage than the gwt test case. 
 Check out the configuration `unitTestPrecedences`
 
 == Setup
